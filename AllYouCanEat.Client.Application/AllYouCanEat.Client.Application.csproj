@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="QRCode.UIComponents.dll" />
+    <BlazorWebAssemblyLazyLoad Include="QRCode.Core.dll" />
+    <BlazorWebAssemblyLazyLoad Include="QRCode.Infrastructure.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AllYouCanEat.Client.Core\AllYouCanEat.Client.Core.csproj" />
+    <ProjectReference Include="..\AllYouCanEat.Client.Infrastructure\AllYouCanEat.Client.Infrastructure.csproj" />
+    <ProjectReference Include="..\AllYouCanEat.Client.QRCode.CodeOfTheDay\AllYouCanEat.Client.QRCode.CodeOfTheDay.csproj" />
+    <ProjectReference Include="..\AllYouCanEat.Client.UiComponents\AllYouCanEat.Client.UIComponents.csproj" />
+    <ProjectReference Include="..\Order\Order.UIComponents\Order.UIComponents.csproj" />
+    <ProjectReference Include="..\QRCode\QRCode.Core.LazyLoaded\QRCode.Core.LazyLoaded.csproj" />
+    <ProjectReference Include="..\QRCode\QRCode.Core\QRCode.Core.csproj" />
+    <ProjectReference Include="..\QRCode\QRCode.Infrastructure\QRCode.Infrastructure.csproj" />
+    <ProjectReference Include="..\QRCode\QRCode.UIComponents\QRCode.UIComponents.csproj" />
+  </ItemGroup>
+
+</Project>

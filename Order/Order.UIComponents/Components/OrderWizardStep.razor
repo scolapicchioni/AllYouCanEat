@@ -1,0 +1,20 @@
+﻿@if (Parent.ActiveStep == this) {
+    @ChildContent
+}
+@code {
+    [CascadingParameter]
+   protected internal OrderWizard Parent { get; set; }
+   [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+
+   [Parameter]
+    public string Name { get; set; }
+
+
+      
+   protected override void OnInitialized()
+   {
+     Parent.AddStep(this);
+   }
+}

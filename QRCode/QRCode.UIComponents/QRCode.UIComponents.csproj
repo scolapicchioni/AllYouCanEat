@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
+	  <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.0" />
+	  <PackageReference Include="SkiaSharp.QrCode" Version="0.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AllYouCanEat.Client.QRCode.CodeOfTheDay\AllYouCanEat.Client.QRCode.CodeOfTheDay.csproj" />
+    <ProjectReference Include="..\QRCode.Core.LazyLoaded\QRCode.Core.LazyLoaded.csproj" />
+    <ProjectReference Include="..\QRCode.Core\QRCode.Core.csproj" />
+    <ProjectReference Include="..\QRCode.Infrastructure\QRCode.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

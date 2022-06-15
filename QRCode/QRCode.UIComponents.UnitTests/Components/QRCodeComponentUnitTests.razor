@@ -1,0 +1,27 @@
+﻿@using QRCode.Core.Interfaces
+@using QRCode.Core.LazyLoaded.Services
+@using SkiaSharp.Views.Blazor
+<h3>QRCodeComponentUnitTests</h3>
+
+@code {
+
+    [Fact]
+    public void DontKnowWhatImDoing() {
+        using var ctx = new TestContext();
+        Mock<IQRCodeService> mockService = new();
+        Mock<IQRCodeServiceFactory> mockServiceFactory = new();
+        mockServiceFactory.Setup(sf => sf.Create()).Returns(mockService.Object);
+
+        ctx.Services.AddSingleton<IQRCodeServiceFactory>(mockServiceFactory.Object);
+
+        ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+        //var moduleInterop = ctx.JSInterop.SetupModule("./_content/SkiaSharp.Views.Blazor/SKHtmlCanvas.js");
+
+        var cut = ctx.Render(
+    @<QRCodeComponent Url="123456"/>);
+
+        //var canvasView = cut.FindComponent<SKCanvasView>();
+
+        mockService.Verify(s => s.RenderQRCodeOnCanvas(It.IsAny<QRCode.Core.Models.QRCodeModel>(), It.IsAny<SkiaSharp.SKCanvas>()));
+    }
+}

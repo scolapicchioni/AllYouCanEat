@@ -1,0 +1,16 @@
+﻿@page "/qr-code"
+@using AllYouCanEat.Client.QRCode.CodeOfTheDay.Core.Interfaces
+<h3>QRCodePage</h3>
+
+<QRCodeComponent Url="@Url"></QRCodeComponent>
+
+@code {
+    [Inject] public ICodeOfTheDayService CodeOfTheDayService { get; set; }
+    [Inject]public NavigationManager Navigator { get; set; }
+    public string Url { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        string code =  await CodeOfTheDayService.GetCodeOfTheDay();
+        Url = $"{Navigator.BaseUri}order/{code}";
+    }
+}

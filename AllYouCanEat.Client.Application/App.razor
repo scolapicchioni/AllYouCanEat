@@ -1,0 +1,42 @@
+﻿@using System.Reflection
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.DependencyInjection;
+@using Order.UIComponents.Pages
+@inject LazyAssemblyLoader AssemblyLoader
+@inject ILogger<App> Logger
+
+<Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="@OnNavigateAsync" AdditionalAssemblies="@lazyLoadedAssemblies" >
+    <Navigating>
+        <div style="padding:20px;background-color:blue;color:white">
+            <p>Loading the requested page&hellip;</p>
+        </div>
+    </Navigating>
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    private List<Assembly> lazyLoadedAssemblies = new() {typeof(OrderPage).Assembly};
+    private async Task OnNavigateAsync(NavigationContext args) {
+        Logger.LogInformation($"OnNavigateAsync: {args.Path}");
+        try {
+            if (args.Path == "qr-code") {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "QRCode.UIComponents.dll", "QRCode.Core.dll", "QRCode.Infrastructure.dll" });
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
+        }
+        catch (Exception ex) {
+            Logger.LogError($"Error: {ex.Message}");
+        }
+    }
+}

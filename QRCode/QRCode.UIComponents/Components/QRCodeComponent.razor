@@ -1,0 +1,33 @@
+﻿@using QRCode.Core.Interfaces
+@using QRCode.Core.LazyLoaded.Services
+@using QRCode.Core.Models
+@using SkiaSharp.Views.Blazor
+@using Microsoft.AspNetCore.Components.Routing
+<h3>Wanna eat?</h3>
+<p>Scan this QR Code or navigate to 
+    <NavLink class="nav-link" href="@Url" Match="NavLinkMatch.All">
+        🥪 @Url 🍽
+    </NavLink>
+</p>
+
+<SKCanvasView width="@Model.Size" height="@Model.Size" OnPaintSurface="OnPaintSurfaceQr" />
+
+@code {
+    [Inject] public IQRCodeServiceFactory QRCodeServiceFactory { get; set; }
+
+    [Parameter]
+    public string Url { get; set; }
+
+    private QRCodeModel Model { get; set; } = new QRCodeModel();
+
+    private IQRCodeService service;
+
+    protected override void OnInitialized() {
+        service = QRCodeServiceFactory.Create();
+    }
+    void OnPaintSurfaceQr(SKPaintSurfaceEventArgs e) {
+        Model.Content = Url;
+        service.RenderQRCodeOnCanvas(Model, e.Surface.Canvas);
+    }
+
+}

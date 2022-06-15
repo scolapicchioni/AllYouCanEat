@@ -1,0 +1,28 @@
+﻿@using AllYouCanEat.Client.QRCode.CodeOfTheDay.Core.Interfaces
+@using QRCode.Core.Interfaces
+@using QRCode.Core.LazyLoaded.Services
+
+@code {
+
+    [Fact]
+    public void DontKnowWhatImDoing() {
+        string code = "42";
+        using var ctx = new TestContext();
+
+        var moduleInterop = ctx.JSInterop.SetupModule("./_content/SkiaSharp.Views.Blazor/SKHtmlCanvas.js");
+
+        Mock<ICodeOfTheDayService> mockCodeOfTheDayService = new();
+        mockCodeOfTheDayService.Setup(s => s.GetCodeOfTheDay()).ReturnsAsync(code);
+        ctx.Services.AddSingleton<ICodeOfTheDayService>(mockCodeOfTheDayService.Object);
+        Mock<IQRCodeService> mockService = new();
+        Mock<IQRCodeServiceFactory> mockServiceFactory = new();
+        mockServiceFactory.Setup(sf => sf.Create()).Returns(mockService.Object);
+        ctx.Services.AddSingleton<IQRCodeServiceFactory>(mockServiceFactory.Object);
+
+        var navMan = ctx.Services.GetRequiredService<FakeNavigationManager>();
+        
+        var cut = ctx.RenderComponent<QRCodePage>();
+        var expected = $"{navMan.BaseUri}order/{code}";
+        Assert.Equal(expected, cut.Instance.Url);
+    }
+}

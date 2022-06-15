@@ -1,0 +1,40 @@
+﻿@page "/order/{code}"
+@using AllYouCanEat.Client.QRCode.CodeOfTheDay.Core.Interfaces
+@using Order.UIComponents.Components
+<h3>OrderPage</h3>
+@*https://github.com/snickler/Samples/tree/master/BlazorWizard/Components*@
+<p>You tried the code @Code</p>
+<p>The code is now @ActualCode</p>
+
+@if (CorrectCode) {
+    <p>Congrats, you can order!</p>
+
+    <OrderWizard>
+        <OrderWizardStep Name="Your Information">
+            First step
+        </OrderWizardStep>
+        <OrderWizardStep Name="What Do You Want?">
+            Second step
+        </OrderWizardStep>
+        <OrderWizardStep Name="Review And Submit Order">
+            Third step
+        </OrderWizardStep>
+    </OrderWizard>
+} else {
+    <p>Wrong code!</p>
+}
+
+@code {
+    [Inject] public ICodeOfTheDayService CodeOfTheDayService { get; set; }
+
+    [Parameter]
+    public string Code { get; set; }
+
+    public string ActualCode { get; set; }
+
+    public bool CorrectCode { get; set; }
+    protected override async Task OnInitializedAsync() {
+        ActualCode = await CodeOfTheDayService.GetCodeOfTheDay();
+        CorrectCode = Code == ActualCode;
+    }
+}
