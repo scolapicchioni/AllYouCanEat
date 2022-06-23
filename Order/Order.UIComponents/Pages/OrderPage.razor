@@ -6,20 +6,22 @@
 <p>You tried the code @Code</p>
 <p>The code is now @ActualCode</p>
 
-@if (CorrectCode) {
+@if (CodeIsCorrect) {
     <p>Congrats, you can order!</p>
 
-    <OrderWizard>
-        <OrderWizardStep Name="Your Information">
-            First step
-        </OrderWizardStep>
-        <OrderWizardStep Name="What Do You Want?">
-            Second step
-        </OrderWizardStep>
-        <OrderWizardStep Name="Review And Submit Order">
-            Third step
-        </OrderWizardStep>
-    </OrderWizard>
+    <CascadingValue Value="Code">
+    <Wizard>
+        <WizardStep Name="Your Information">
+            <CustomerComponent></CustomerComponent>
+        </WizardStep>
+        <WizardStep Name="What Do You Want?">
+            <ProductsList></ProductsList>
+        </WizardStep>
+        <WizardStep Name="Review And Submit Order">
+            <VerifyAndSubmitOrder></VerifyAndSubmitOrder>
+        </WizardStep>
+    </Wizard>
+    </CascadingValue>
 } else {
     <p>Wrong code!</p>
 }
@@ -32,9 +34,9 @@
 
     public string ActualCode { get; set; }
 
-    public bool CorrectCode { get; set; }
+    public bool CodeIsCorrect { get; set; }
     protected override async Task OnInitializedAsync() {
         ActualCode = await CodeOfTheDayService.GetCodeOfTheDay();
-        CorrectCode = Code == ActualCode;
+        CodeIsCorrect = Code == ActualCode;
     }
 }

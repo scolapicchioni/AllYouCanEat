@@ -1,0 +1,76 @@
+﻿@using Order.Core.Entities
+@using Order.Core.Interfaces
+@inject IBasketService basketService
+@inject ICustomerService customerService
+<h3>VerifyAndSubmitOrder</h3>
+
+@if (customer is not null) {
+    <p>Name: @customer.Name</p>
+    <p>Room: @customer.Room</p>
+    <p>Additional Notes: @customer.Note</p>
+}
+
+@if(basket is not null) {
+    @foreach (Product product in basket) {
+        <p>@product.Quantity @product?.Name</p>
+        if (product.AdditionalChoices is not null) {
+            @foreach (AdditionalChoice choice in product.AdditionalChoices) {
+                switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
+                    case (1,1,_): //one required choice
+                        @if (choice.SelectedChoices is not null) {
+                            <p>@choice.Name : @choice.SelectedChoices.First()</p>
+                        }
+                        break;
+                    case (0,1,1): //one true or false choice 
+                        <p>
+                            @choice.Name:
+                            @if (choice.SelectedChoices is null || choice.SelectedChoices.Count()==0) {
+                                @:Nee
+                            }else {
+                                @:Ja
+                            }
+                        </p>
+                        break;
+                    case (0,1,>1): //one optional choice between many
+                        @if (choice.SelectedChoices is not null) {
+                            <p>@choice.Name</p>
+                            <ul>
+                                @foreach (var selectedChoice in choice.SelectedChoices) {
+                                    <li>@selectedChoice</li>
+                                }
+                            </ul>
+                        }
+                        break;
+                    case (_,>1,>=1): //multiple choices
+                    <p>@choice.Name</p>
+                        @if (choice.SelectedChoices is not null) {
+                            <ul>
+                                @foreach (var selectedChoice in choice.SelectedChoices) {
+                                    <li>@selectedChoice</li>
+                                }
+                            </ul>
+                        }
+                        break;
+                }
+            }
+
+        }
+    }
+}
+@code {
+    private Customer customer;
+    private IEnumerable<Product> basket;
+
+    [CascadingParameter]
+    public string Code { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        try {
+            customer = await customerService.GetCustomer();
+            basket = await basketService.GetProducts(Code);
+        } catch (Exception ex) {
+            Console.WriteLine(ex.GetType().Name + " " + ex.Message);
+
+        }
+    }
+}

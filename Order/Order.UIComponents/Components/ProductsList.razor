@@ -1,0 +1,48 @@
+﻿@using Order.Core.Entities
+@using Order.Core.Interfaces
+@using System.Text.Json
+@inject IProductsService productsService
+@inject IBasketService basketService
+<h3>ProductsList</h3>
+
+@if (Products is not null) {
+    foreach (string category in Products.Keys) {
+        <h2>@category</h2>
+        foreach (Product product in Products[category]) {
+            <div>
+                <p>
+                    @if(addingProductName == product.Name){
+                        <ProductToAddToBasket Product="product" OnAddProduct="AddProductToBasket"></ProductToAddToBasket>
+                    }else{
+                        <h3>@product.Name</h3>
+                        @if (product.GlutenFree) {
+                            @:(Gluten Free) 
+                        }
+                        @if (product.Vegetarian) {
+                            @:(Vegetarian)
+                        }
+                        <button @onclick="@(e=>Show(product.Name))">Select Product</button>
+                    }
+                </p>
+            </div>
+        }
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public string Code { get; set; }
+
+    public Dictionary<string, List<Product>> Products{get;set;}
+    string addingProductName = string.Empty;
+    protected override async Task OnInitializedAsync() {
+        Products = await productsService.GetAvailableProductsAsync();
+    }
+    public void Show(string productToShow) {
+        addingProductName = productToShow;
+    }
+    public void AddProductToBasket(Product productToAdd) {
+        basketService.PutInBasket(Code, productToAdd);
+        addingProductName = string.Empty;
+    }
+}

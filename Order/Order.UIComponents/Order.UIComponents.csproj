@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AllYouCanEat.Client.QRCode.CodeOfTheDay\AllYouCanEat.Client.QRCode.CodeOfTheDay.csproj" />
+    <ProjectReference Include="..\Order.Core\Order.Core.csproj" />
+    <ProjectReference Include="..\Order.Infrastructure\Order.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

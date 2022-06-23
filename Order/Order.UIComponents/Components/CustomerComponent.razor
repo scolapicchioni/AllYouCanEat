@@ -1,0 +1,41 @@
+﻿@using Order.Core.Entities
+@using Order.Core.Interfaces
+@inject ICustomerService customerService
+<h3>CustomerComponent</h3>
+
+@if (customer is not null) {
+    <label>Name:</label>
+    <input type="text" value="@customer.Name" @onchange="NameChanged" />
+    <label>Room:</label>
+    <input type="text" value="@customer.Room" @onchange="RoomChanged" />
+    <label>Additional Notes (Do you have allergies? Is there anything you want us to know? Write it here!):</label>
+    <input type="text" value="@customer.Note" @onchange="NoteChanged" />
+}
+@code {
+    private Customer customer;
+
+    private string Name;
+
+    protected override async Task OnInitializedAsync() {
+        customer = await customerService.GetCustomer();
+        if (customer is null) {
+            customer = new Customer();
+        }
+    }
+
+    async Task NameChanged(ChangeEventArgs args) {
+        customer.Name = (string)args.Value;
+        await SaveCustomer();
+    }
+    async Task RoomChanged(ChangeEventArgs args) {
+        customer.Room = (string)args.Value;
+        await SaveCustomer();
+    }
+    async Task NoteChanged(ChangeEventArgs args) {
+        customer.Note = (string)args.Value;
+        await SaveCustomer();
+    }
+    async Task SaveCustomer() {
+        await customerService.SaveCustomer(customer);
+    }
+}

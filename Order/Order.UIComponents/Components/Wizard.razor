@@ -20,7 +20,7 @@
 </CascadingValue>
 @code {
 
-    protected internal List<OrderWizardStep> Steps = new List<OrderWizardStep>();
+    protected internal List<WizardStep> Steps = new List<WizardStep>();
 
         /// <summary>
         /// The control Id
@@ -38,7 +38,7 @@
         /// The Active <see cref="WizardStep"/>
         /// </summary>
         [Parameter]
-        public OrderWizardStep ActiveStep { get; set; }
+        public WizardStep ActiveStep { get; set; }
 
         /// <summary>
         /// The Index number of the <see cref="ActiveStep"/>
@@ -76,7 +76,7 @@
         /// </summary>
         /// <param name="step">The WizardStep</param>
 
-        protected internal void SetActive(OrderWizardStep step)
+        protected internal void SetActive(WizardStep step)
         {
             ActiveStep = step ?? throw new ArgumentNullException(nameof(step));
 
@@ -92,8 +92,8 @@
         /// </summary>
         /// <param name="step">The WizardStep</param>
         /// <returns></returns>
-        public int StepsIndex(OrderWizardStep step) => StepsIndexInternal(step);
-        protected int StepsIndexInternal(OrderWizardStep step)
+        public int StepsIndex(WizardStep step) => StepsIndexInternal(step);
+        protected int StepsIndexInternal(WizardStep step)
         {
             if (step == null)
                 throw new ArgumentNullException(nameof(step));
@@ -104,7 +104,7 @@
         /// Adds a <see cref="WizardStep"/> to the WizardSteps list
         /// </summary>
         /// <param name="step"></param>
-        protected internal void AddStep(OrderWizardStep step)
+        protected internal void AddStep(WizardStep step)
         {
             Steps.Add(step);
         }

@@ -14,8 +14,8 @@
 
         ctx.Services.AddSingleton<IQRCodeServiceFactory>(mockServiceFactory.Object);
 
-        ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-        //var moduleInterop = ctx.JSInterop.SetupModule("./_content/SkiaSharp.Views.Blazor/SKHtmlCanvas.js");
+        //ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+        var moduleInterop = ctx.JSInterop.SetupModule("./_content/SkiaSharp.Views.Blazor/SKHtmlCanvas.js");
 
         var cut = ctx.Render(
     @<QRCodeComponent Url="123456"/>);

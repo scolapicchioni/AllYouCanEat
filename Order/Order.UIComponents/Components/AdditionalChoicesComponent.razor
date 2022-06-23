@@ -1,0 +1,82 @@
+﻿@using Order.Core.Entities
+@using System.Text.Json
+@if (AdditionalChoices is not null) {
+    <div>
+        <h4>Additional Choices:</h4>
+        @foreach (AdditionalChoice choice in AdditionalChoices) {
+            switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
+                case (1,1,_): //option buttons
+                    <h5>@choice.Name (Select 1)</h5>
+                    <select @onchange="@(async e=> await ChoiceChanged(e,choice))"> @*@bind="choice.SelectedChoices"*@
+                    @foreach (string possibleChoice in choice.PossibleChoices) {
+                        <option value="@possibleChoice" selected="@(choice.SelectedChoices.Contains(possibleChoice))">@possibleChoice</option>
+                    }
+                    </select>
+                    break;
+                case (0,1,>1)://option buttons with added "None"
+                    <h5>@choice.Name (Select 1)</h5>
+                    <select @onchange="@(async e=> await ChoiceChanged(e,choice))"> @*@bind="choice.SelectedChoices"*@
+                        <option value="none">None</option>
+                    @foreach (string possibleChoice in choice.PossibleChoices) {
+                        <option value="@possibleChoice"  selected="@(choice.SelectedChoices.Contains(possibleChoice))">@possibleChoice</option>
+                    }
+                    </select>
+                    break;
+                case (0,1,1): //one checkbox
+                    <h5>@choice.Name</h5>                   
+                    @foreach (string possibleChoice in choice.PossibleChoices) {
+                        <input type="checkbox" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />@possibleChoice<br/>
+                    }
+                    break;
+                case (_,>1,>=1): //multiple checkboxes
+                     <h5>@choice.Name (between @choice.MinimumSelectableChoices and @choice.MaximumSelectableChoices)</h5>
+                    
+                    @foreach (string possibleChoice in choice.PossibleChoices) {
+                        <input type="checkbox" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />@possibleChoice
+                    }
+                    
+                    break;
+            }
+
+           
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<AdditionalChoice>? AdditionalChoices { get; set; }
+    [Parameter]
+    public EventCallback<List<AdditionalChoice>>  AdditionalChoicesChanged { get; set; }
+
+    List<AdditionalChoice>? choices;
+    protected override void OnInitialized() {
+        choices = JsonSerializer.Deserialize<List<AdditionalChoice>>(JsonSerializer.Serialize(AdditionalChoices));
+    }
+
+    async Task MultipleChoiceChanged(ChangeEventArgs e, AdditionalChoice choice, string selectedChoice) {
+        Console.WriteLine(e.Value);
+        bool value = (bool)e.Value;
+        if (value) {
+            choices.First(c => c.Name == choice.Name).SelectedChoices.Add(selectedChoice);
+        } else{
+            choices.First(c => c.Name == choice.Name).SelectedChoices.Remove(selectedChoice);
+        }
+        await AdditionalChoicesChanged.InvokeAsync(choices);
+    }
+
+    async Task ChoiceChanged(ChangeEventArgs e, AdditionalChoice choice) {
+        Console.WriteLine(e.Value);
+        choices.First(c => c.Name == choice.Name).SelectedChoices = new List<string>(){ (string)e.Value} ;
+        await AdditionalChoicesChanged.InvokeAsync(choices);
+    }
+    //async Task BooleanChoiceChanged(ChangeEventArgs e, AdditionalChoice choice) {
+    //    Console.WriteLine(e.Value);
+    //    bool value = (bool)e.Value;
+    //    if(value)
+    //        choices.First(c => c.Name == choice.Name).SelectedChoices = new string[1]{ choice.Name} ;
+    //    else
+    //        choices.First(c => c.Name == choice.Name).SelectedChoices = new string[0];
+    //    await AdditionalChoicesChanged.InvokeAsync(choices);
+    //}
+}

@@ -5,6 +5,7 @@ using AllYouCanEat.Client.Infrastructure.Repositories;
 using AllYouCanEat.Client.QRCode.CodeOfTheDay.ServiceExtensions;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Order.Infrastructure;
 using QRCode.Core.LazyLoaded.ServiceCollectionExtensions;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -15,6 +16,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddCodeOfTheDayServices();
 builder.Services.AddLazyLoadedQRCodeServices();
+builder.Services.AddOrderServices();
 builder.Services.AddScoped<IMilliwaysService, MilliwaysService>();
 builder.Services.AddScoped<IMilliwaysRepository, MilliwaysRepository>();
 

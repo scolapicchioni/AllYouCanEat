@@ -1,0 +1,35 @@
+﻿@using Order.Core.Entities
+@using System.Text.Json
+
+<EditForm Model="@ProductToAdd" OnValidSubmit="@AddToBasket">
+<div>
+        <h3>@Product.Name</h3>
+        @if (Product.GlutenFree) {
+            @:(Gluten Free) 
+        }
+        @if (Product.Vegetarian) {
+            @:(Vegetarian)
+        }
+        <AdditionalChoicesComponent @bind-AdditionalChoices="@ProductToAdd.AdditionalChoices"></AdditionalChoicesComponent>
+        
+        <div>Quantity: <InputNumber @bind-Value="ProductToAdd.Quantity" /></div>
+        <button type="submit" >Add To Basket</button>
+</div>
+</EditForm>
+@code {
+    [Parameter]
+    public Product Product { get; set; }
+
+    public Product ProductToAdd { get; set; }
+
+    [Parameter]
+    public EventCallback<Product> OnAddProduct{ get; set; }
+
+    protected override void OnInitialized() {
+        ProductToAdd = JsonSerializer.Deserialize<Product>(JsonSerializer.Serialize(Product));
+    }
+    private async Task AddToBasket() {
+        
+        await OnAddProduct.InvokeAsync(ProductToAdd);
+    }
+}
