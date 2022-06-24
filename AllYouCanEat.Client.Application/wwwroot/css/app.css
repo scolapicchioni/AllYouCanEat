@@ -1,20 +1,38 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+@font-face {
+    font-family: 'GraphikRegular';
+    src: url("https://training.infosupport.com/wp-content/themes/roots.ist24062022/assets/fonts/graphikregular.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'PxGrotesk';
+    src: url("https://training.infosupport.com/wp-content/themes/roots.ist24062022/assets/fonts/PxGroteskRegular.woff2") format("woff2")
+}
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'GraphikRegular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: rgb(238,238,238);
+    color: #02315a;
 }
 
 h1:focus {
     outline: none;
 }
 
+.btn {
+    color: white;
+    background-color: #0D9DDB;
+    border: 0;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 15%), 0 1px 1px rgb(0 0 0 / 8%);
+    transition: color 0.15s ease-in-out,background-color 0.15s ease-in-out,border-color 0.15s ease-in-out,box-shadow 0.15s ease-in-out;
+}
 a, .btn-link {
     color: #0071c1;
 }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
+    background-color: #0D9DDB;
     border-color: #1861ac;
 }
 

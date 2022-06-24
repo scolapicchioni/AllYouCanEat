@@ -1,5 +1,5 @@
 ﻿namespace Order.Core.Entities;
-public class AdditionalChoice {
+public class AdditionalChoice  {
     public int Id { get; set; }
     public string Name { get; set; }
     public List<string>  PossibleChoices { get; set; }

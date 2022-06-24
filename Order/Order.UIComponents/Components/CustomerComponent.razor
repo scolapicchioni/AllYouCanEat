@@ -1,20 +1,27 @@
 ﻿@using Order.Core.Entities
 @using Order.Core.Interfaces
 @inject ICustomerService customerService
-<h3>CustomerComponent</h3>
+<h3>Student</h3>
 
 @if (customer is not null) {
-    <label>Name:</label>
-    <input type="text" value="@customer.Name" @onchange="NameChanged" />
-    <label>Room:</label>
-    <input type="text" value="@customer.Room" @onchange="RoomChanged" />
-    <label>Additional Notes (Do you have allergies? Is there anything you want us to know? Write it here!):</label>
-    <input type="text" value="@customer.Note" @onchange="NoteChanged" />
+    <div class="form">
+        <div class="form-group">
+            <label>Name:</label>
+            <input type="text" value="@customer.Name" @onchange="NameChanged" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Room:</label>
+            <input type="text" value="@customer.Room" @onchange="RoomChanged" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Additional Notes (Do you have allergies? Is there anything you want us to know? Write it here!):</label>
+            <input type="text" value="@customer.Note" @onchange="NoteChanged" class="form-control" />
+        </div>
+    </div>
 }
 @code {
     private Customer customer;
 
-    private string Name;
 
     protected override async Task OnInitializedAsync() {
         customer = await customerService.GetCustomer();

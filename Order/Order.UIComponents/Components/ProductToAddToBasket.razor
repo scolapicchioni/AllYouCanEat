@@ -1,35 +1,53 @@
 ﻿@using Order.Core.Entities
 @using System.Text.Json
+@using Order.Core.Entities.Basket
 
-<EditForm Model="@ProductToAdd" OnValidSubmit="@AddToBasket">
-<div>
-        <h3>@Product.Name</h3>
-        @if (Product.GlutenFree) {
-            @:(Gluten Free) 
-        }
-        @if (Product.Vegetarian) {
-            @:(Vegetarian)
-        }
-        <AdditionalChoicesComponent @bind-AdditionalChoices="@ProductToAdd.AdditionalChoices"></AdditionalChoicesComponent>
-        
-        <div>Quantity: <InputNumber @bind-Value="ProductToAdd.Quantity" /></div>
-        <button type="submit" >Add To Basket</button>
-</div>
-</EditForm>
+@if(BasketItem is not null){
+    <EditForm Model="@BasketItem" OnValidSubmit="@AddToBasket">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@BasketItem.Name</h5>
+                @if (Product.GlutenFree) {
+                    <small class="text-muted">Gluten Free</small>
+                }
+                @if (Product.Vegetarian) {
+                    <small class="text-muted">Vegetarian</small>
+                }
+                @if(Product.AdditionalChoices is not null){
+                    <AdditionalChoicesComponent  @bind-AdditionalChoices="BasketItem.AdditionalChoices" PossibleChoices="Product.AdditionalChoices"></AdditionalChoicesComponent>
+                }
+                <div class="form-group">
+                    <label>Quantity: </label>
+                    <InputNumber @bind-Value="BasketItem.Quantity" class="form-control"/>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn" type="submit" >Add To Basket</button>
+                <button class="btn" @onclick="OnCancel">Cancel</button>
+            </div>
+        </div>
+    </EditForm>
+}
 @code {
     [Parameter]
     public Product Product { get; set; }
 
-    public Product ProductToAdd { get; set; }
+    [Parameter]
+    public BasketItem BasketItem { get; set; }
 
     [Parameter]
-    public EventCallback<Product> OnAddProduct{ get; set; }
+    public EventCallback<BasketItem> OnAddItemToBasket{ get; set; }
+
+
+    [Parameter]
+    public EventCallback OnCancel{ get; set; }
 
     protected override void OnInitialized() {
-        ProductToAdd = JsonSerializer.Deserialize<Product>(JsonSerializer.Serialize(Product));
+        BasketItem = BasketItem.FromProduct(Product);
+        BasketItem.Quantity = 1;
     }
     private async Task AddToBasket() {
         
-        await OnAddProduct.InvokeAsync(ProductToAdd);
+        await OnAddItemToBasket.InvokeAsync(BasketItem);
     }
 }

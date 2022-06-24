@@ -6,5 +6,4 @@ public class Product {
     public bool Vegetarian { get; set; }
     public bool GlutenFree { get; set; }
     public List<AdditionalChoice>? AdditionalChoices { get; set; }
-    public int Quantity { get; set; }
 }

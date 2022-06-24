@@ -1,8 +1,9 @@
 ﻿@using Order.Core.Entities
+@using Order.Core.Entities.Basket
 @using Order.Core.Interfaces
 @inject IBasketService basketService
 @inject ICustomerService customerService
-<h3>VerifyAndSubmitOrder</h3>
+<h3>Verify And Submit Order</h3>
 
 @if (customer is not null) {
     <p>Name: @customer.Name</p>
@@ -11,55 +12,13 @@
 }
 
 @if(basket is not null) {
-    @foreach (Product product in basket) {
-        <p>@product.Quantity @product?.Name</p>
-        if (product.AdditionalChoices is not null) {
-            @foreach (AdditionalChoice choice in product.AdditionalChoices) {
-                switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
-                    case (1,1,_): //one required choice
-                        @if (choice.SelectedChoices is not null) {
-                            <p>@choice.Name : @choice.SelectedChoices.First()</p>
-                        }
-                        break;
-                    case (0,1,1): //one true or false choice 
-                        <p>
-                            @choice.Name:
-                            @if (choice.SelectedChoices is null || choice.SelectedChoices.Count()==0) {
-                                @:Nee
-                            }else {
-                                @:Ja
-                            }
-                        </p>
-                        break;
-                    case (0,1,>1): //one optional choice between many
-                        @if (choice.SelectedChoices is not null) {
-                            <p>@choice.Name</p>
-                            <ul>
-                                @foreach (var selectedChoice in choice.SelectedChoices) {
-                                    <li>@selectedChoice</li>
-                                }
-                            </ul>
-                        }
-                        break;
-                    case (_,>1,>=1): //multiple choices
-                    <p>@choice.Name</p>
-                        @if (choice.SelectedChoices is not null) {
-                            <ul>
-                                @foreach (var selectedChoice in choice.SelectedChoices) {
-                                    <li>@selectedChoice</li>
-                                }
-                            </ul>
-                        }
-                        break;
-                }
-            }
-
-        }
+    @foreach (BasketItem basketItem in basket) {
+        <BasketItemComponent BasketItem="basketItem" OnDelete="DeleteBasketItem"></BasketItemComponent>
     }
 }
 @code {
     private Customer customer;
-    private IEnumerable<Product> basket;
+    private IEnumerable<BasketItem> basket;
 
     [CascadingParameter]
     public string Code { get; set; }
@@ -67,10 +26,19 @@
     protected override async Task OnInitializedAsync() {
         try {
             customer = await customerService.GetCustomer();
-            basket = await basketService.GetProducts(Code);
+            basket = await basketService.GetBasketItems(Code);
         } catch (Exception ex) {
             Console.WriteLine(ex.GetType().Name + " " + ex.Message);
 
         }
+    }
+
+    //async Task QuantityChanged(ChangeEventArgs args, BasketItem basketItem) {
+    //    await basketService.UpdateQuantity(Code, basketItem.Id, int.Parse(args.Value.ToString()));
+    //}
+
+    async Task DeleteBasketItem(BasketItem itemToDelete) {
+        await basketService.DeleteBasketItem(Code, itemToDelete.Id);
+        basket = await basketService.GetBasketItems(Code);
     }
 }

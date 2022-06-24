@@ -11,4 +11,6 @@ public class ProductsService : IProductsService {
     public Task<Dictionary<string,List<Product>>> GetAvailableProductsAsync() {
         return repository.GetAvailableProductsAsync();
     }
+
+    public Task<Product?> GetProductById(int productId) => repository.GetProductById(productId);
 }

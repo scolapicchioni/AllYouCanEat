@@ -1,12 +1,13 @@
 ﻿@using Order.Core.Entities
+@using Order.Core.Entities.Basket
 @using System.Text.Json
-@if (AdditionalChoices is not null) {
+@if (PossibleChoices is not null && AdditionalChoices is not null) {
     <div>
-        <h4>Additional Choices:</h4>
-        @foreach (AdditionalChoice choice in AdditionalChoices) {
+        <h5>Additional Choices:</h5>
+        @foreach (AdditionalChoice choice in PossibleChoices) {
             switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
                 case (1,1,_): //option buttons
-                    <h5>@choice.Name (Select 1)</h5>
+                    <h6>@choice.Name (Select 1)</h6>
                     <select @onchange="@(async e=> await ChoiceChanged(e,choice))"> @*@bind="choice.SelectedChoices"*@
                     @foreach (string possibleChoice in choice.PossibleChoices) {
                         <option value="@possibleChoice" selected="@(choice.SelectedChoices.Contains(possibleChoice))">@possibleChoice</option>
@@ -14,8 +15,8 @@
                     </select>
                     break;
                 case (0,1,>1)://option buttons with added "None"
-                    <h5>@choice.Name (Select 1)</h5>
-                    <select @onchange="@(async e=> await ChoiceChanged(e,choice))"> @*@bind="choice.SelectedChoices"*@
+                    <h6>@choice.Name (Select 1)</h6>
+                    <select class="form-control" @onchange="@(async e=> await ChoiceChanged(e,choice))"> @*@bind="choice.SelectedChoices"*@
                         <option value="none">None</option>
                     @foreach (string possibleChoice in choice.PossibleChoices) {
                         <option value="@possibleChoice"  selected="@(choice.SelectedChoices.Contains(possibleChoice))">@possibleChoice</option>
@@ -23,35 +24,42 @@
                     </select>
                     break;
                 case (0,1,1): //one checkbox
-                    <h5>@choice.Name</h5>                   
+                    <h6>@choice.Name</h6>                   
                     @foreach (string possibleChoice in choice.PossibleChoices) {
-                        <input type="checkbox" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />@possibleChoice<br/>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />
+                            <label class="form-check-label">@possibleChoice</label>
+                        </div>
                     }
                     break;
                 case (_,>1,>=1): //multiple checkboxes
-                     <h5>@choice.Name (between @choice.MinimumSelectableChoices and @choice.MaximumSelectableChoices)</h5>
-                    
+                     <h6>@choice.Name (between @choice.MinimumSelectableChoices and @choice.MaximumSelectableChoices)</h6>
                     @foreach (string possibleChoice in choice.PossibleChoices) {
-                        <input type="checkbox" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />@possibleChoice
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" checked="@(choice.SelectedChoices.Contains(possibleChoice))" @onchange="@(async e=> await MultipleChoiceChanged(e,choice, possibleChoice))" />
+                            <label class="form-check-label">@possibleChoice</label>
+                        </div>
                     }
-                    
                     break;
             }
-
-           
         }
     </div>
 }
 
 @code {
     [Parameter]
-    public List<AdditionalChoice>? AdditionalChoices { get; set; }
+    public List<BasketItemAdditionalChoice>? AdditionalChoices { get; set; }
     [Parameter]
-    public EventCallback<List<AdditionalChoice>>  AdditionalChoicesChanged { get; set; }
+    public EventCallback<List<BasketItemAdditionalChoice>>  AdditionalChoicesChanged { get; set; }
 
-    List<AdditionalChoice>? choices;
+    [Parameter]
+    public List<AdditionalChoice>? PossibleChoices { get; set; }
+
+
+    List<BasketItemAdditionalChoice>? choices;
+
     protected override void OnInitialized() {
-        choices = JsonSerializer.Deserialize<List<AdditionalChoice>>(JsonSerializer.Serialize(AdditionalChoices));
+        choices = PossibleChoices.Select(p=> BasketItemAdditionalChoice.FromPossibleChoice(p)).ToList();
     }
 
     async Task MultipleChoiceChanged(ChangeEventArgs e, AdditionalChoice choice, string selectedChoice) {

@@ -1,0 +1,80 @@
+﻿@using Order.Core.Entities
+@using Order.Core.Entities.Basket
+@using Order.Core.Interfaces
+@inject IBasketService basketService
+@inject IProductsService productsService
+
+@if (BasketItem is not null && product is not null) {
+    <div class="row">
+    <div class="card col-md-6">
+    <p><input class="form-control" type="number" @oninput="QuantityChanged" value="@BasketItem.Quantity" size="3" /> @BasketItem.Name</p>
+    @if (product.AdditionalChoices is not null) {
+        @foreach (AdditionalChoice choice in product.AdditionalChoices) {
+            switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
+                case (1, 1, _): //one required choice
+                    @if (choice.SelectedChoices is not null) {
+                        <p>@choice.Name : @choice.SelectedChoices.First()</p>
+                    }
+
+                    break;
+                case (0, 1, 1): //one true or false choice 
+                    <p>
+                        @choice.Name:
+                        @if (choice.SelectedChoices is null || choice.SelectedChoices.Count() == 0) {
+                            @:Nee
+                        } else {
+                            @:Ja
+                        }
+                    </p>
+                    break;
+                case (0, 1, > 1): //one optional choice between many
+                    @if (choice.SelectedChoices is not null) {
+                        <p>@choice.Name</p>
+                        <ul class="list-group-flush">
+                            @foreach (var selectedChoice in choice.SelectedChoices) {
+                                <li class="list-group-item">@selectedChoice</li>
+                            }
+                        </ul>
+                    }
+
+                    break;
+                case (_, > 1, >= 1): //multiple choices
+                    <p>@choice.Name</p>
+                    @if (choice.SelectedChoices is not null) {
+                        <ul class="list-group-flush">
+                            @foreach (var selectedChoice in choice.SelectedChoices) {
+                                <li class="list-group-item">@selectedChoice</li>
+                            }
+                        </ul>
+                    }
+
+                    break;
+            }
+        }
+
+    }
+    <button class="btn" @onclick="@(async e=>await OnDelete.InvokeAsync(BasketItem))">Delete</button>
+    </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public string Code { get; set; }
+
+    [Parameter]
+    public BasketItem BasketItem { get; set; }
+
+    [Parameter]
+    public EventCallback<BasketItem> OnDelete { get; set; }
+
+    Product product;
+
+    protected override async Task OnInitializedAsync() {
+        product = await productsService.GetProductById(BasketItem.ProductId);
+    }
+
+    async Task QuantityChanged(ChangeEventArgs args) {
+        await basketService.UpdateQuantity(Code, BasketItem.Id, int.Parse(args.Value.ToString()));
+    }
+}

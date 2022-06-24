@@ -1,9 +1,11 @@
-﻿using Order.Core.Entities;
+﻿using Order.Core.Entities.Basket;
 
 namespace Order.Core.Interfaces;
 public interface IBasketService {
-    Task<Product> PutInBasket(string basketId, Product product);
-    Task<Product> GetProduct(string basketId, int productId);
-    Task<IEnumerable<Product>> GetProducts(string basketId);
-    Task<int> GetProductsCount(string basketId);
+    Task<BasketItem> PutInBasket(string basketId, BasketItem item);
+    Task<BasketItem> GetBasketItem(string basketId, int basketItemId);
+    Task<IEnumerable<BasketItem>> GetBasketItems(string basketId);
+    Task<int> GetBasketItemsCount(string basketId);
+    Task<BasketItem?> DeleteBasketItem(string basketId, int basketItemId);
+    Task UpdateQuantity(string basketId, int basketItemId, int quantity);
 }

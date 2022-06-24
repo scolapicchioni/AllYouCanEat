@@ -1,48 +1,60 @@
 ﻿@using Order.Core.Entities
+@using Order.Core.Entities.Basket
 @using Order.Core.Interfaces
 @using System.Text.Json
 @inject IProductsService productsService
 @inject IBasketService basketService
-<h3>ProductsList</h3>
+<h3>Available Products</h3>
 
-@if (Products is not null) {
-    foreach (string category in Products.Keys) {
-        <h2>@category</h2>
-        foreach (Product product in Products[category]) {
-            <div>
-                <p>
-                    @if(addingProductName == product.Name){
-                        <ProductToAddToBasket Product="product" OnAddProduct="AddProductToBasket"></ProductToAddToBasket>
-                    }else{
-                        <h3>@product.Name</h3>
-                        @if (product.GlutenFree) {
-                            @:(Gluten Free) 
-                        }
-                        @if (product.Vegetarian) {
-                            @:(Vegetarian)
-                        }
-                        <button @onclick="@(e=>Show(product.Name))">Select Product</button>
+@if(product is not null){
+    <ProductToAddToBasket Product="product" BasketItem="BasketItem" OnAddItemToBasket="AddItemToBasket" OnCancel="CancelAdd"></ProductToAddToBasket>
+}else{
+    @if (Products is not null) {
+        foreach (string category in Products.Keys) {
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <h2>@category</h2>
+                    @foreach (Product p in Products[category]) {
+                        <div class="card">
+                            <h5 class="card-title">@p.Name</h5>
+                            @if (p.GlutenFree) {
+                                @:(Gluten Free) 
+                            }
+                            @if (p.Vegetarian) {
+                                @:(Vegetarian)
+                            }
+                            <button class="btn" @onclick="@(e=>Show(p))">Select Product</button>
+                        </div>
                     }
-                </p>
-            </div>
+                </li>
+            </ul>
         }
     }
 }
-
 @code {
     [CascadingParameter]
     public string Code { get; set; }
 
     public Dictionary<string, List<Product>> Products{get;set;}
     string addingProductName = string.Empty;
+    Product? product;
+    BasketItem BasketItem;
     protected override async Task OnInitializedAsync() {
         Products = await productsService.GetAvailableProductsAsync();
     }
-    public void Show(string productToShow) {
-        addingProductName = productToShow;
+    public void Show(Product product) {
+        BasketItem = BasketItem.FromProduct(product);
+        BasketItem.Quantity = 1;
+        addingProductName = product.Name;
+        this.product = product;
     }
-    public void AddProductToBasket(Product productToAdd) {
-        basketService.PutInBasket(Code, productToAdd);
+    public void AddItemToBasket(BasketItem basketItem) {
+        basketService.PutInBasket(Code, basketItem);
         addingProductName = string.Empty;
+        product = null;
+    }
+    public void CancelAdd() {
+        addingProductName = string.Empty;
+        product = null;
     }
 }
