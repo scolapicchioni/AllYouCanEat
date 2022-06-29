@@ -4,30 +4,34 @@
 @using System.Text.Json
 @inject IProductsService productsService
 @inject IBasketService basketService
-<h3>Available Products</h3>
 
 @if(product is not null){
     <ProductToAddToBasket Product="product" BasketItem="BasketItem" OnAddItemToBasket="AddItemToBasket" OnCancel="CancelAdd"></ProductToAddToBasket>
 }else{
     @if (Products is not null) {
         foreach (string category in Products.Keys) {
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <h2>@category</h2>
-                    @foreach (Product p in Products[category]) {
-                        <div class="card">
-                            <h5 class="card-title">@p.Name</h5>
+            <div class="row">
+                <h2>@category</h2>
+                @foreach (Product p in Products[category]) {
+                    <div class="row">
+                        <div class="col col-sm-12">
+                        <div class="card" @onclick="@(e=>Show(p))" style="cursor:pointer">
+                            <div class="card-header">
+                                
+                            <h5 class="card-title">@p.Name 
                             @if (p.GlutenFree) {
-                                @:(Gluten Free) 
+                                    <span class="ml-auto">🌽</span>
                             }
                             @if (p.Vegetarian) {
-                                @:(Vegetarian)
+                                @:🥦
                             }
-                            <button class="btn" @onclick="@(e=>Show(p))">Select Product</button>
+                            </h5>
+                            </div>
                         </div>
-                    }
-                </li>
-            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
         }
     }
 }

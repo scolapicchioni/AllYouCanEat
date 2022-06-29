@@ -5,12 +5,8 @@ namespace Order.Core.Services;
 public class ProductsService : IProductsService {
     private readonly IProductsRepository repository;
 
-    public ProductsService(IProductsRepository repository) {
-        this.repository = repository;
-    }
-    public Task<Dictionary<string,List<Product>>> GetAvailableProductsAsync() {
-        return repository.GetAvailableProductsAsync();
-    }
+    public ProductsService(IProductsRepository repository) => this.repository = repository;
+    public Task<Dictionary<string, List<Product>>> GetAvailableProductsAsync() => repository.GetAvailableProductsAsync();
 
     public Task<Product?> GetProductById(int productId) => repository.GetProductById(productId);
 }

@@ -14,9 +14,9 @@
         </div>
     </div>
     <button class="btn btn-primary btn-lg" type="button" 
-            disabled="@(ActiveStepIx == 0)" @onclick="GoBack">Previous</button>
+            disabled="@(ActiveStepIx == 0)" @onclick="GoBack">◀</button>
     <button class="btn btn-primary btn-lg" 
-            type="@(IsLastStep ? "submit" : "button")" @onclick="GoNext">@(IsLastStep ? "Submit" : "Next")</button>
+            type="@(IsLastStep ? "submit" : "button")" @onclick="GoNext">@(IsLastStep ? "👌" : "▶")</button>
 </CascadingValue>
 @code {
 

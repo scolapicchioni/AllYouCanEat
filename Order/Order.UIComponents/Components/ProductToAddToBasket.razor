@@ -6,13 +6,14 @@
     <EditForm Model="@BasketItem" OnValidSubmit="@AddToBasket">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">@BasketItem.Name</h5>
+                <h5 class="card-title">@BasketItem.Name
                 @if (Product.GlutenFree) {
-                    <small class="text-muted">Gluten Free</small>
+                    @:🌽
                 }
                 @if (Product.Vegetarian) {
-                    <small class="text-muted">Vegetarian</small>
+                    @:🥦
                 }
+                </h5>
                 @if(Product.AdditionalChoices is not null){
                     <AdditionalChoicesComponent  @bind-AdditionalChoices="BasketItem.AdditionalChoices" PossibleChoices="Product.AdditionalChoices"></AdditionalChoicesComponent>
                 }
@@ -22,8 +23,8 @@
                 </div>
             </div>
             <div class="card-footer">
-                <button class="btn" type="submit" >Add To Basket</button>
-                <button class="btn" @onclick="OnCancel">Cancel</button>
+                <button class="btn" @onclick="OnCancel">⏹</button>
+                <button class="btn" type="submit">☑</button>
             </div>
         </div>
     </EditForm>

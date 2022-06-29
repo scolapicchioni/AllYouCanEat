@@ -5,22 +5,27 @@
 @inject IProductsService productsService
 
 @if (BasketItem is not null && product is not null) {
-    <div class="row">
-    <div class="card col-md-6">
-    <p><input class="form-control" type="number" @oninput="QuantityChanged" value="@BasketItem.Quantity" size="3" /> @BasketItem.Name</p>
+    <div class="row justify-content-around">
+    <div class="card col-sm-6">
+        <div class="row align-items-center">
+            <div class="col-sm-2"><input class="form-control" type="number" @oninput="QuantityChanged" value="@BasketItem.Quantity" /> </div>
+            <h6 class="col-sm-9">@BasketItem.Name</h6>
+            <button class="btn col-sm-1" @onclick="@(async e=>await OnDelete.InvokeAsync(BasketItem))">🚮</button>
+        </div>
     @if (product.AdditionalChoices is not null) {
         @foreach (AdditionalChoice choice in product.AdditionalChoices) {
-            switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
+                List<string> basketItemChoices = BasketItem.AdditionalChoices.FirstOrDefault(ac => ac.Id == choice.Id).SelectedChoices;
+                switch (@choice.MinimumSelectableChoices, @choice.MaximumSelectableChoices, @choice.PossibleChoices.Count()) {
                 case (1, 1, _): //one required choice
                     @if (choice.SelectedChoices is not null) {
-                        <p>@choice.Name : @choice.SelectedChoices.First()</p>
+                        <p>@choice.Name : @basketItemChoices.First()</p>
                     }
 
                     break;
                 case (0, 1, 1): //one true or false choice 
                     <p>
                         @choice.Name:
-                        @if (choice.SelectedChoices is null || choice.SelectedChoices.Count() == 0) {
+                        @if (basketItemChoices is null || basketItemChoices.Count() == 0) {
                             @:Nee
                         } else {
                             @:Ja
@@ -28,53 +33,51 @@
                     </p>
                     break;
                 case (0, 1, > 1): //one optional choice between many
-                    @if (choice.SelectedChoices is not null) {
-                        <p>@choice.Name</p>
-                        <ul class="list-group-flush">
-                            @foreach (var selectedChoice in choice.SelectedChoices) {
-                                <li class="list-group-item">@selectedChoice</li>
-                            }
-                        </ul>
+                    @if (basketItemChoices is not null) {
+                        <p>@choice.Name: 
+                        @if (basketItemChoices is not null) {
+                            @string.Join(',', basketItemChoices);            
+                        }
+                        </p>
                     }
 
                     break;
                 case (_, > 1, >= 1): //multiple choices
-                    <p>@choice.Name</p>
-                    @if (choice.SelectedChoices is not null) {
-                        <ul class="list-group-flush">
-                            @foreach (var selectedChoice in choice.SelectedChoices) {
-                                <li class="list-group-item">@selectedChoice</li>
-                            }
-                        </ul>
+                    <p>@choice.Name: 
+                    @if (basketItemChoices is not null) {
+                        @string.Join(',', basketItemChoices);            
                     }
+                    </p>
 
                     break;
             }
         }
 
     }
-    <button class="btn" @onclick="@(async e=>await OnDelete.InvokeAsync(BasketItem))">Delete</button>
+    
     </div>
     </div>
 }
 
 @code {
-    [CascadingParameter]
-    public string Code { get; set; }
+        [CascadingParameter]
+        public string Code { get; set; }
 
-    [Parameter]
-    public BasketItem BasketItem { get; set; }
+        [Parameter]
+        public BasketItem BasketItem { get; set; }
 
-    [Parameter]
-    public EventCallback<BasketItem> OnDelete { get; set; }
+        [Parameter]
+        public EventCallback<BasketItem> OnDelete { get; set; }
 
-    Product product;
+        Product product;
 
     protected override async Task OnInitializedAsync() {
         product = await productsService.GetProductById(BasketItem.ProductId);
     }
 
     async Task QuantityChanged(ChangeEventArgs args) {
-        await basketService.UpdateQuantity(Code, BasketItem.Id, int.Parse(args.Value.ToString()));
+        if (int.TryParse(args.Value?.ToString(),out int result)){
+            await basketService.UpdateQuantity(Code, BasketItem.Id, result);
+        }
     }
 }

@@ -10,7 +10,7 @@ public class BasketRepository : IBasketRepository {
         this.localStorage = localStorage;
     }
 
-    private async Task<HashSet<BasketItem>> getBasket(string basketId) {
+    internal async Task<HashSet<BasketItem>> GetBasket(string basketId) {
         HashSet<BasketItem> basket = await localStorage.GetItemAsync<HashSet<BasketItem>>(basketId);
         if (basket is null) { 
             basket = new HashSet<BasketItem>();
@@ -18,13 +18,16 @@ public class BasketRepository : IBasketRepository {
         }
         return basket;
     }
-    public async Task<BasketItem> AddBasketItem(string basketId, BasketItem basketItem) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+    public async Task<BasketItem> UpsertBasketItem(string basketId, BasketItem basketItem) {
+        HashSet<BasketItem> basket = await GetBasket(basketId);
         if (basketItem.Id == 0) {
             basketItem.Id = basket.Count() == 0 ? 1 : basket.Max(bi => bi.Id) + 1;
         }
-        
-        //TODO: compare each selecte choice and eventually change the quantity instead of adding the product twice
+
+        BasketItem? itemToReplace = basket.FirstOrDefault(bi => bi.Id == basketItem.Id);
+        if (itemToReplace is not null) {
+            basket.Remove(itemToReplace);
+        }
         basket.Add(basketItem);
         
         await localStorage.SetItemAsync(basketId, basket);
@@ -32,7 +35,7 @@ public class BasketRepository : IBasketRepository {
     }
 
     public async Task<BasketItem?> DeleteBasketItem(string basketId, int basketItemId) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+        HashSet<BasketItem> basket = await GetBasket(basketId);
         BasketItem? found = basket.FirstOrDefault(i => i.Id == basketItemId); 
         if (found is not null) { 
             basket.Remove(found);
@@ -42,22 +45,22 @@ public class BasketRepository : IBasketRepository {
     }
 
     public async Task<BasketItem?> GetBasketItem(string basketId, int basketItemId) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+        HashSet<BasketItem> basket = await GetBasket(basketId);
         return basket.FirstOrDefault(p => p.Id == basketItemId);
     }
 
     public async Task<IEnumerable<BasketItem>> GetBasketItems(string basketId) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+        HashSet<BasketItem> basket = await GetBasket(basketId);
         return basket.ToList();
     }
 
     public async Task<int> GetBasketItemsCount(string basketId) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+        HashSet<BasketItem> basket = await GetBasket(basketId);
         return basket.Count();
     }
 
     public async Task UpdateQuantity(string basketId, int basketItemId, int quantity) {
-        HashSet<BasketItem> basket = await getBasket(basketId);
+        HashSet<BasketItem> basket = await GetBasket(basketId);
 
         BasketItem existing = basket.First(i => i.Id == basketItemId); 
         if (existing is not null) {
