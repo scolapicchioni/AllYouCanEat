@@ -1,29 +1,27 @@
 ﻿@page "/order/{code}"
 @using AllYouCanEat.Client.QRCode.CodeOfTheDay.Core.Interfaces
 @using Order.UIComponents.Components
-<h3>Order</h3>
+<h3>Eten Bestellen</h3>
 @*https://github.com/snickler/Samples/tree/master/BlazorWizard/Components*@
-<p>You tried the code @Code</p>
-<p>The code is now @ActualCode</p>
 
 @if (CodeIsCorrect) {
-    <p>Congrats, you can order!</p>
-
     <CascadingValue Value="Code">
     <Wizard>
-        <WizardStep Name="Your Information">
+        <WizardStep Name="Student Info">
             <CustomerComponent></CustomerComponent>
         </WizardStep>
-        <WizardStep Name="What Do You Want?">
+        <WizardStep Name="Beschikbare Opties">
             <ProductsList></ProductsList>
         </WizardStep>
-        <WizardStep Name="Review And Submit Order">
+        <WizardStep Name="Je Bestelling">
             <VerifyAndSubmitOrder></VerifyAndSubmitOrder>
         </WizardStep>
     </Wizard>
     </CascadingValue>
 } else {
     <p>Wrong code!</p>
+    <p>You tried the code @Code</p>
+    <p>The code is now @ActualCode</p>
 }
 
 @code {
